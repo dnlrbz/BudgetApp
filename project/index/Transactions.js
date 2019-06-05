@@ -1,9 +1,9 @@
 export default class Transactions {
-    constructor(element) {
+    constructor(element, userMail) {
         this._el = element;
         //this._app = firebase.app();
         this._db = firebase.firestore();
-        this._lastIdOfTransaction = 
+        this._userMail = userMail;
         this._render();
 
         this._el.addEventListener('click', event => {
@@ -170,7 +170,7 @@ export default class Transactions {
 `
 
 
-
+/*
         this._db.collection("transactions").get().then(function(querySnapshot) {
 
             querySnapshot.forEach(function(doc) {
@@ -182,10 +182,25 @@ export default class Transactions {
 
         })
             .catch(err => console.log(err));
+*/
+
+        this._db.collection("transactions").where("user_id", "==", this._userMail)
+            .get()
+            .then(function(querySnapshot) {
+
+                querySnapshot.forEach(function(doc) {
+                    // doc.data() is never undefined for query doc snapshots
+                    const data = doc.data();
+                    self._addTransaction(doc.id, data.description, data.amount, data.type, data.user_id);
+                });
+
+                //console.log(resultArray);
+            })
+            .catch(function(error) {
+                console.log("Error getting documents: ", error);
+            });
 
     }
 
-    _createTransactionHTML(id, description, amount, type) {
 
-    }
 }

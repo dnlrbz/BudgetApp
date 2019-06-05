@@ -10,7 +10,7 @@ export default class AppController {
                 self._renderAfterLogin();
                 console.log('already logged in');
                 self._user = user;
-                self._trans = new Transactions(document.getElementById('transactions_table'));
+                self._trans = new Transactions(document.getElementById('transactions_table'), self._user.email);
             } else {
                 self._renderBeforeLogin();
                 console.log('not logged in');

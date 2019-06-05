@@ -3,6 +3,7 @@ export default class Transactions {
         this._el = element;
         //this._app = firebase.app();
         this._db = firebase.firestore();
+        this._lastIdOfTransaction = 
         this._render();
 
         this._el.addEventListener('click', event => {
@@ -39,10 +40,44 @@ export default class Transactions {
     };
 
 
-    _addTransaction(transactionText) {
-        let transaction = document.createElement('LI');
-        transaction.innerHTML = `<p data-id="${transactionText}">${transactionText}</p>`;
-        this._el.querySelector('#transactions-list').appendChild(transaction);
+    _addTransaction(id, description, amount, type, userMail) {
+
+        //Adding to HTML
+        let transaction = document.createElement('div');
+
+        transaction.innerHTML = `
+            <div class="item clearfix" data-id=${id}>
+                <div class="item__description">${description}</div>
+                      <div class="right clearfix">
+                           <div class="item__value">${amount}</div>
+                           <div class="item__delete">
+                               <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                           </div>
+                      </div>                   
+            </div>    
+                            `;
+        if (type === 'inc') {
+            this._el.querySelector('.income__list').appendChild(transaction);
+        } else {
+            this._el.querySelector('.expenses__list').appendChild(transaction);
+        }
+
+        //Adding to database:
+
+        this._db.collection("transactions").doc(id.toString()).set({
+            amount: amount,
+            description: description,
+            type: type,
+            user_id: userMail
+        })
+            .then(function() {
+                console.log("Document successfully written!");
+            })
+            .catch(function(error) {
+                console.error("Error writing document: ", error);
+            });
+
+
     }
 
     _deleteTransaction(id, element) {
@@ -58,24 +93,99 @@ export default class Transactions {
 
     _render() {
         let self = this;
+        /*
         self._el.innerHTML = `
-        <ul id="transactions-list">
-          
-        </ul>
+        <div class="income__list">
+        <h2 class="icome__title">Income</h2>
+        
+        </div>
+        
         `;
+        */
+        self._el.innerHTML = `<div class="container clearfix">
+                <div class="income">
+                    <h2 class="icome__title">Income</h2>
+                      
+                    <div class="income__list">
+                       
+                      <!--
+                        <div class="item clearfix" id="income-0">
+                            <div class="item__description">Salary</div>
+                            <div class="right clearfix">
+                                <div class="item__value">+ 2,100.00</div>
+                                <div class="item__delete">
+                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="item clearfix" id="income-1">
+                            <div class="item__description">Sold car</div>
+                            <div class="right clearfix">
+                                <div class="item__value">+ 1,500.00</div>
+                                <div class="item__delete">
+                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                       
+                     -->   
+                    </div>
+                     
+                </div>
+                
+                
+                
+                <div class="expenses">
+                  <h2 class="expenses__title">Expenses</h2>  
+                    
+                    <div class="expenses__list">
+                       
+                        <!--
+                        <div class="item clearfix" id="expense-0">
+                            <div class="item__description">Apartment rent</div>
+                            <div class="right clearfix">
+                                <div class="item__value">- 900.00</div>
+                                <div class="item__percentage">21%</div>
+                                <div class="item__delete">
+                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item clearfix" id="expense-1">
+                            <div class="item__description">Grocery shopping</div>
+                            <div class="right clearfix">
+                                <div class="item__value">- 435.28</div>
+                                <div class="item__percentage">10%</div>
+                                <div class="item__delete">
+                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+                        
+                    </div>
+                </div>
+            </div>
+`
+
+
 
         this._db.collection("transactions").get().then(function(querySnapshot) {
 
             querySnapshot.forEach(function(doc) {
-                // doc.data() is never undefined for query doc snapshots
-                //console.log(doc.id, " => ", doc.data());
-                //resultArray.push(doc.data());
-                self._addTransaction(doc.id);
+                const data = doc.data();
+                self._addTransaction(doc.id, data.description, data.amount, data.type, data.user_id);
+
             });
 
 
         })
             .catch(err => console.log(err));
+
+    }
+
+    _createTransactionHTML(id, description, amount, type) {
 
     }
 }

@@ -19,7 +19,6 @@ export default class AppController {
 
 
 
-
         this._addEventListeners();
 
 
@@ -44,14 +43,41 @@ export default class AppController {
 
             if (event.target.id === 'add__btn' || event.target.parentElement.id === 'add__btn') {
                 console.log('add button fired');
+
                 let type = document.querySelector('.add__type').value;
-                let description = document.querySelector('.add__description').value;
-                let value = document.querySelector('.add__value').value;
-                console.log(type, description, value, this._user.email);
-                console.log('random id: ' + Math.round(Math.random()*100000000));
-                let userMail = this._user.email;
-                this._trans._addTransaction.call(this._trans, Math.round(Math.random()*100000000), description, value, type, userMail);
+                let description = document.querySelector('.add__description');
+                let value = document.querySelector('.add__value');
+                if (description!=='' && value !=='') {
+                    console.log(type, description, value, this._user.email);
+                    console.log('random id: ' + Math.round(Math.random()*100000000));
+                    let userMail = this._user.email;
+                    this._trans._addTransaction.call(this._trans, Math.round(Math.random()*100000000), description.value, value.value, type, userMail);
+                }
+                description.value = '';
+                value.value = '';
+
             }
+
+            if (event.target.id === 'show_expenses' || event.target.id === 'show_income') {
+                if (event.target.id === 'show_expenses') {
+                    document.querySelector('.expenses').classList.remove('invisible');
+                    document.querySelector('.income').classList.add('invisible');
+                } else {
+                    document.querySelector('.expenses').classList.add('invisible');
+                    document.querySelector('.income').classList.remove('invisible');
+                }
+
+
+            }
+
+            if (event.target.classList.contains('deleteb')) {
+                let itemToDelete = event.target.closest('.item');
+                let idToDelete = itemToDelete.dataset.id;
+                this._trans._deleteTransaction(idToDelete, itemToDelete);
+            }
+
+            console.log(event.target);
+
         });
 
 
@@ -73,7 +99,7 @@ export default class AppController {
             this._user = result.user;
             console.log('logged in ' + this._user.displayName);
             this._renderAfterLogin();
-            this._trans = new Transactions(document.querySelector('.income'));
+
         })
             .catch(err => console.log(err));
     }
@@ -135,9 +161,24 @@ export default class AppController {
                     </select>
                     <input type="text" class="add__description" placeholder="Add description">
                     <input type="number" class="add__value" placeholder="Value">
-                    <button id="add__btn" class="add__btn"><i class="ion-ios-checkmark-outline"></i></button>
+                    <button id="add__btn" class="add__btn btn btn-primary"><i class="ion-ios-checkmark-outline">Add</i></button>
+                </div>
+                
+               
+            </div >
+            <div class="toggle_buttons buttons_choise text-center">
+                <div class="btn-group btn-group-toggle " data-toggle="buttons">
+                      <label class="btn btn-primary active" id="show_income">
+                        <input type="radio" name="options"  autocomplete="off" checked>Show income
+                      </label>
+                      <label class="btn btn-primary" id="show_expenses">
+                        <input type="radio" name="options"  autocomplete="off">Show expenses
+                      </label>
+                      
                 </div>
             </div>
+           
+            
             
             <div id="transactions_table">
             

@@ -18,32 +18,11 @@ export default class Transactions {
 
 
 
-    _getAllTransactionsByUserMail(email) {
-        let resultArray = [];
-
-        firebase.firestore().collection("transactions").where("user_id", "==", email)
-            .get()
-            .then(function(querySnapshot) {
-
-                querySnapshot.forEach(function(doc) {
-                    // doc.data() is never undefined for query doc snapshots
-                    let transaction = doc.data();
-                    resultArray.push(transaction);
-                });
-
-                //console.log(resultArray);
-            })
-            .catch(function(error) {
-                console.log("Error getting documents: ", error);
-            });
-        return resultArray;
-    };
-
-
     _addTransaction(id, description, amount, type, userMail) {
 
         //Adding to HTML
         let transaction = document.createElement('div');
+
 
         transaction.innerHTML = `
             <div class="item clearfix" data-id=${id}>
@@ -51,15 +30,16 @@ export default class Transactions {
                       <div class="right clearfix">
                            <div class="item__value">${amount}</div>
                            <div class="item__delete">
-                               <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                <button class="item__delete--btn deleteb">x</button>
                            </div>
                       </div>                   
             </div>    
                             `;
         if (type === 'inc') {
-            this._el.querySelector('.income__list').appendChild(transaction);
+
+            this._el.querySelector('.income__list').insertBefore(transaction, this._el.querySelector('.income__list').children[0]);
         } else {
-            this._el.querySelector('.expenses__list').appendChild(transaction);
+            this._el.querySelector('.expenses__list').appendChild(transaction, this._el.querySelector('.expenses__list').children[0]);
         }
 
         //Adding to database:
@@ -93,16 +73,8 @@ export default class Transactions {
 
     _render() {
         let self = this;
-        /*
-        self._el.innerHTML = `
-        <div class="income__list">
-        <h2 class="icome__title">Income</h2>
-        
-        </div>
-        
-        `;
-        */
-        self._el.innerHTML = `<div class="container clearfix">
+
+        this._el.innerHTML = `<div class="container clearfix">
                 <div class="income">
                     <h2 class="icome__title">Income</h2>
                       
@@ -136,7 +108,7 @@ export default class Transactions {
                 
                 
                 
-                <div class="expenses">
+                <div class="expenses invisible">
                   <h2 class="expenses__title">Expenses</h2>  
                     
                     <div class="expenses__list">
@@ -170,19 +142,7 @@ export default class Transactions {
 `
 
 
-/*
-        this._db.collection("transactions").get().then(function(querySnapshot) {
 
-            querySnapshot.forEach(function(doc) {
-                const data = doc.data();
-                self._addTransaction(doc.id, data.description, data.amount, data.type, data.user_id);
-
-            });
-
-
-        })
-            .catch(err => console.log(err));
-*/
 
         this._db.collection("transactions").where("user_id", "==", this._userMail)
             .get()

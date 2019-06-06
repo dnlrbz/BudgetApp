@@ -31,6 +31,11 @@ body {
 *** TOP PART
 **********************************************/
 
+.toggle_buttons {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .top {
     height: 40vh;
     background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url(./images/back.png);
@@ -113,6 +118,9 @@ body {
 *** BOTTOM PART
 **********************************************/
 
+/***** TRANSACTIONS ******/
+
+
 /***** FORM *****/
 .add {
     padding: 14px;
@@ -136,6 +144,16 @@ body {
     font-weight: 300;
     transition: border 0.3s;
 }
+
+.buttons_choise {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+}
+
+/******* TEST****/
+
+
 
 .add__description,
 .add__value {
@@ -177,9 +195,13 @@ body {
 .add__btn:focus { outline: none; }
 
 /***** LISTS *****/
+.invisible {
+    display: none;
+}
 .container {
-    width: 1000px;
-    margin: 60px auto;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .control_buttons {
@@ -197,14 +219,17 @@ body {
 }
 
 .income {
-    float: left;
-    width: 475px;
-    margin-right: 50px;
+    margin-top: 5px;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .expenses {
-    float: left;
-    width: 475px;
+    margin-top: 5px;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 h2 {
@@ -214,10 +239,11 @@ h2 {
     margin-bottom: 15px;
 }
 
-.icome__title { color: #28B9B5; margin-left: 200px;}
-.expenses__title { color: #FF5049; margin-left: 200px;}
+.icome__title { color: #28B9B5; text-align: center;}
+.expenses__title { color: #FF5049; text-align: center;}
 
 .item {
+    font-size: 1.3em;
     padding: 13px;
     border-bottom: 1px solid #e7e7e7;
 }
@@ -246,14 +272,22 @@ h2 {
     text-align: center;
 }
 
-.income .item__value,
+
 .income .item__delete--btn {
+    color: white;
+}
+
+.income .item__value {
     color: #28B9B5;
 }
 
-.expenses .item__value,
-.expenses .item__percentage,
+
+
 .expenses .item__delete--btn {
+    color: white;
+}
+
+.expenses .item__percentage, .expenses .item__value {
     color: #FF5049;
 }
 
@@ -263,8 +297,9 @@ h2 {
 }
 
 .item__delete--btn {
+    cursor: pointer;
     font-size: 22px;
-    background: none;
+    background: white;
     border: none;
     cursor: pointer;
     display: inline-block;
@@ -273,8 +308,24 @@ h2 {
     display: none;
 }
 
+.deleteb {
+    background: #FF5049;
+    padding: 7px 15px 7px 15px;
+    border-radius: 100px;
+    color: white;
+    border: 1px solid red;
+    transition: 0.5s linear;
+    outline: none;
+}
+
+.deleteb:hover {
+    background: darkred;
+}
+
 .item__delete--btn:focus { outline: none; }
 .item__delete--btn:active { transform: translateY(2px); }
+
+
 
 .item:hover .item__delete--btn { display: block; }
 .item:hover .item__value { transform: translateX(-20px); }

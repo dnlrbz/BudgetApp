@@ -144,7 +144,7 @@ export default class AppController {
                     <div class="budget__expenses--text">Expenses</div>
                     <div class="right clearfix">
                         <div class="budget__expenses--value">%value%</div>
-                        <div class="budget__expenses--percentage">%percentage%</div>
+                        <div class="budget__expenses--percentage">%p%</div>
                     </div>
                 </div>
             </div>

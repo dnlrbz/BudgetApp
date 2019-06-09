@@ -1,9 +1,10 @@
 export default class Transactions {
-    constructor(element, userMail) {
+    constructor(element, userMail, dataCallback) {
         this._el = element;
         //this._app = firebase.app();
         this._db = firebase.firestore();
         this._userMail = userMail;
+        this._dataCallback = dataCallback;
         this._render();
 
         this._el.addEventListener('click', event => {
@@ -20,6 +21,13 @@ export default class Transactions {
 
     _addTransaction(id, description, amount, type, userMail) {
 
+        this._dataCallback({
+            id: id,
+            description: description,
+            amount: amount,
+            type: type,
+            userMail: userMail,
+        }, 'add');
         //Adding to HTML
         let transaction = document.createElement('div');
 
@@ -61,6 +69,9 @@ export default class Transactions {
     }
 
     _deleteTransaction(id, element) {
+        this._dataCallback({
+            id: id,
+        }, 'remove');
         element.parentElement.removeChild(element);
         console.log('child removed');
         this._db.collection("transactions").doc(id).delete().then(function() {
@@ -152,6 +163,7 @@ export default class Transactions {
                     // doc.data() is never undefined for query doc snapshots
                     const data = doc.data();
                     self._addTransaction(doc.id, data.description, data.amount, data.type, data.user_id);
+
                 });
 
                 //console.log(resultArray);

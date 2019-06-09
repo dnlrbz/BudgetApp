@@ -5,16 +5,26 @@ export default class AppController {
     constructor({element}) {
         this._el = element;
         let self = this;
+        this._data = {
+            transactionsArray: [],
+            total: 0,
+            income: 0,
+            expenses: 0,
+            expensesPercentage: 0,
+        };
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
+                self._user = user;
                 self._renderAfterLogin();
                 console.log('already logged in');
-                self._user = user;
-                self._trans = new Transactions(document.getElementById('transactions_table'), self._user.email);
+
+                self._trans = new Transactions(document.getElementById('transactions_table'), self._user.email, self._updateData.bind(self));
+                self._updateData();
             } else {
                 self._renderBeforeLogin();
                 console.log('not logged in');
             }
+
         });
 
 
@@ -26,11 +36,59 @@ export default class AppController {
 
     }
 
+    _updateData(transaction, typeOfAction) {
+        //updating total
+        if(typeOfAction === 'add') {
+            this._data.transactionsArray.push(transaction);
+        }
+        if( typeOfAction === 'remove') {
+            this._data.transactionsArray = this._data.transactionsArray.filter(item => item.id!==transaction.id);
+        }
+
+        let total = Number((this._data.transactionsArray.reduce(function (accumulator, currentItem) {
+            return currentItem.type === 'inc' ? accumulator + Number(currentItem.amount) : accumulator - Number(currentItem.amount);
+        }, 0))) ;
+        this._data.total = total.toFixed(2);
+
+        let income = Number(this._data.transactionsArray.reduce(function (accumulator, currentItem) {
+            if (currentItem.type ==='inc') {
+                return accumulator + Number(currentItem.amount);
+            }
+            return accumulator;
+        }, 0));
+        this._data.income = income.toFixed(2);
+
+
+
+        let expenses = Number(this._data.transactionsArray.reduce(function (accumulator, currentItem) {
+            if (currentItem.type ==='exp') {
+                return accumulator + Number(currentItem.amount);
+            }
+            return accumulator;
+        }, 0));
+        this._data.expenses = expenses.toFixed(2);
+
+
+        let expPerc = Number(+this._data.expenses/ this._data.income) * 100;
+        this._data.expensesPercentage = isFinite(expPerc) ? expPerc.toFixed(1) : 100;
+
+        this._updateBudgetUI();
+
+    }
+
+    _updateBudgetUI() {
+        //console.log('new total: ' +this._data.total);
+        document.querySelector('.budget__value').innerHTML = this._data.total + '€';
+        document.querySelector('.budget__income--value').innerHTML = this._data.income + '€';
+        document.querySelector('.budget__expenses--value').innerHTML = this._data.expenses + '€';
+        document.querySelector('.budget__expenses--percentage').innerHTML = this._data.expensesPercentage + '%';
+    }
+
     _addEventListeners() {
 
         document.addEventListener('DOMContentLoaded', event => {
             const app = firebase.app();
-            console.log('dom content loaded');
+            //console.log('dom content loaded');
         });
 
         this._el.addEventListener('click', event => {
@@ -42,17 +100,18 @@ export default class AppController {
             }
 
             if (event.target.id === 'add__btn' || event.target.parentElement.id === 'add__btn') {
-                console.log('add button fired');
+                //console.log('add button fired');
 
                 let type = document.querySelector('.add__type').value;
                 let description = document.querySelector('.add__description');
                 let value = document.querySelector('.add__value');
-                if (description!=='' && value !=='') {
-                    console.log(type, description, value, this._user.email);
-                    console.log('random id: ' + Math.round(Math.random()*100000000));
-                    let userMail = this._user.email;
-                    this._trans._addTransaction.call(this._trans, Math.round(Math.random()*100000000), description.value, value.value, type, userMail);
-                }
+                if (description.value==='' || value.value===0 || value.value==='') return;
+
+                console.log(type, description.value, value.value, this._user.email);
+                //console.log('random id: ' + Math.round(Math.random()*100000000).toString());
+                let userMail = this._user.email;
+                this._trans._addTransaction.call(this._trans, Math.round(Math.random()*100000000).toString(), description.value, value.value, type, userMail);
+
                 description.value = '';
                 value.value = '';
 
@@ -76,7 +135,7 @@ export default class AppController {
                 this._trans._deleteTransaction(idToDelete, itemToDelete);
             }
 
-            console.log(event.target);
+            //console.log(event.target);
 
         });
 
@@ -97,7 +156,7 @@ export default class AppController {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(provider).then(result => {
             this._user = result.user;
-            console.log('logged in ' + this._user.displayName);
+            //console.log('logged in ' + this._user.displayName);
             this._renderAfterLogin();
 
         })
@@ -107,8 +166,33 @@ export default class AppController {
 
     _renderBeforeLogin() {
         this._el.innerHTML = `
-        <button id="login-btn">Login with google</button>
-        <button id="logout-btn">Logout</button>
+        
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+              <ol class="carousel-indicators">
+                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+              </ol>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img src="./images/iphone.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="./images/mac.jpg" class="d-block w-100" alt="...">
+                </div>
+              </div>
+              <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+              
+              <div class="main-text hidden-xs hidden-sm text-center">
+                    <button class="btn btn-primary btn-lg btn-block text-center" id="login-btn">Login with google</button>
+              </div>
+        </div>
         `
 
     }
@@ -123,19 +207,19 @@ export default class AppController {
             
             <div class="top">
             <div class="control_buttons">
-                <button class="logout-btn" id="logout-btn">Logout</button>
+                <button class="btn-primary" id="logout-btn">Logout</button>
             </div>
             <div class="budget">
                 <div class="budget__title">
-                    Available Budget in <span class="budget__title--month">%Month%</span>:
+                    This is your budget, <span class="budget__title--month">${this._user.displayName.split(' ')[0]}</span>:
                 </div>
                 
-                <div class="budget__value">0 €</div>
+                <div class="budget__value">%%</div>
                 
                 <div class="budget__income clearfix">
                     <div class="budget__income--text">Income</div>
                     <div class="right">
-                        <div class="budget__income--value">%value%</div>
+                        <div class="budget__income--value"></div>
                        <!-- <div class="budget__income--percentage">0 %</div> -->
                     </div>
                 </div>
@@ -143,8 +227,8 @@ export default class AppController {
                 <div class="budget__expenses clearfix">
                     <div class="budget__expenses--text">Expenses</div>
                     <div class="right clearfix">
-                        <div class="budget__expenses--value">%value%</div>
-                        <div class="budget__expenses--percentage">%p%</div>
+                        <div class="budget__expenses--value"></div>
+                        <div class="budget__expenses--percentage"></div>
                     </div>
                 </div>
             </div>

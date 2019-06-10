@@ -167,17 +167,14 @@ export default class AppController {
     _renderBeforeLogin() {
         this._el.innerHTML = `
         
-        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-              <ol class="carousel-indicators">
-                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-              </ol>
+        <div id="carouselExampleIndicators" class="carousel slide text-center" data-ride="carousel">
+             
               <div class="carousel-inner">
-                <div class="carousel-item active">
-                  <img src="./images/iphone.jpg" class="d-block w-100" alt="...">
+                <div class="carousel-item active item min-vh-100">
+                  <img src="./images/iphone.jpg" class="d-block min-vh-100 zoom" alt="...">
                 </div>
-                <div class="carousel-item">
-                  <img src="./images/mac.jpg" class="d-block w-100" alt="...">
+                <div class="carousel-item item min-vh-100">
+                  <img src="./images/mac.jpg" class="d-block min-vh-100 zoom" alt="...">
                 </div>
               </div>
               <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -190,7 +187,12 @@ export default class AppController {
               </a>
               
               <div class="main-text hidden-xs hidden-sm text-center">
-                    <button class="btn btn-primary btn-lg btn-block text-center" id="login-btn">Login with google</button>
+                    <p class="h1 main-text-item">Track your budget for <span class="badge badge-info">Free</span></p>
+                    <p class="h2 main-text-item"><span class="badge badge-success">Secure</span> data storing and transmission</p>
+                    <p class="h2 main-text-item"><span class="badge badge-light ">Fast</span> log in with your Google account</p>
+                    <button class="btn btn-primary btn-lg google" id="login-btn">
+                    <p class="button-text">Log in with Google</p>
+                    </button>
               </div>
         </div>
         `

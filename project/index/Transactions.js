@@ -33,7 +33,7 @@ export default class Transactions {
 
 
         transaction.innerHTML = `
-            <div class="item clearfix" data-id=${id}>
+            <div class="item-a clearfix" data-id=${id}>
                 <div class="item__description">${description}</div>
                       <div class="right clearfix">
                            <div class="item__value">${amount}</div>

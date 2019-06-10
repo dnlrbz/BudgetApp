@@ -112,7 +112,7 @@ export default class AppController {
                 //console.log('random id: ' + Math.round(Math.random()*100000000).toString());
                 let userMail = this._user.email;
                 let date = new Date();
-                let time = moment().format('ll');
+                let time = date.getDate() + '.' + Number(date.getUTCMonth()+1);
                 this._trans._addTransaction.call(this._trans, Math.round(Math.random()*100000000).toString(), description.value, value.value, type, userMail, time);
 
                 description.value = '';

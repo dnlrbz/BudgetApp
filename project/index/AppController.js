@@ -1,6 +1,7 @@
 
 import Transactions from "./Transactions.js";
 
+
 export default class AppController {
     constructor({element}) {
         this._el = element;
@@ -92,7 +93,7 @@ export default class AppController {
         });
 
         this._el.addEventListener('click', event => {
-            if (event.target.id === 'login-btn') {
+            if (event.target.id === 'login-btn' || event.target.parentElement.id === 'login-btn') {
                 this._googleLogin();
             }
             if (event.target.id === 'logout-btn') {
@@ -110,7 +111,9 @@ export default class AppController {
                 console.log(type, description.value, value.value, this._user.email);
                 //console.log('random id: ' + Math.round(Math.random()*100000000).toString());
                 let userMail = this._user.email;
-                this._trans._addTransaction.call(this._trans, Math.round(Math.random()*100000000).toString(), description.value, value.value, type, userMail);
+                let date = new Date();
+                let time = moment().format('ll');
+                this._trans._addTransaction.call(this._trans, Math.round(Math.random()*100000000).toString(), description.value, value.value, type, userMail, time);
 
                 description.value = '';
                 value.value = '';
@@ -130,7 +133,7 @@ export default class AppController {
             }
 
             if (event.target.classList.contains('deleteb')) {
-                let itemToDelete = event.target.closest('.item');
+                let itemToDelete = event.target.closest('.item-a');
                 let idToDelete = itemToDelete.dataset.id;
                 this._trans._deleteTransaction(idToDelete, itemToDelete);
             }
@@ -187,10 +190,9 @@ export default class AppController {
               </a>
               
               <div class="main-text hidden-xs hidden-sm text-center">
-                    <p class="h1 main-text-item">Track your budget for <span class="badge badge-info">Free</span></p>
-                    <p class="h2 main-text-item"><span class="badge badge-success">Secure</span> data storing and transmission</p>
-                    <p class="h2 main-text-item"><span class="badge badge-light ">Fast</span> log in with your Google account</p>
-                    <button class="btn btn-primary btn-lg google" id="login-btn">
+                    <p class="h1 main-text-item">Secure and free personal budget tracker</span></p>
+                    
+                    <button class="btn btn-primary btn-lg google text-center" id="login-btn">
                     <p class="button-text">Log in with Google</p>
                     </button>
               </div>
@@ -242,12 +244,12 @@ export default class AppController {
             <div class="add">
                 <div class="add__container">
                     <select class="add__type">
-                        <option value="inc" selected>+</option>
-                        <option value="exp">-</option>
+                        <option value="inc" selected>income</option>
+                        <option value="exp">expense</option>
                     </select>
                     <input type="text" class="add__description" placeholder="Add description">
                     <input type="number" class="add__value" placeholder="Value">
-                    <button id="add__btn" class="add__btn btn btn-primary"><i class="ion-ios-checkmark-outline">Add</i></button>
+                    <button id="add__btn" class="add__btn btn btn-success"><i class="ion-ios-checkmark-outline">Add</i></button>
                 </div>
                 
                

@@ -19,7 +19,7 @@ export default class Transactions {
 
 
 
-    _addTransaction(id, description, amount, type, userMail) {
+    _addTransaction(id, description, amount, type, userMail, time) {
 
         this._dataCallback({
             id: id,
@@ -27,27 +27,43 @@ export default class Transactions {
             amount: amount,
             type: type,
             userMail: userMail,
+            time: time
         }, 'add');
         //Adding to HTML
         let transaction = document.createElement('div');
 
-
         transaction.innerHTML = `
             <div class="item-a clearfix" data-id=${id}>
-                <div class="item__description">${description}</div>
+                <div class="item__description"><span>${description}</span><span class="item-time">${time}</span></div>
+                
                       <div class="right clearfix">
                            <div class="item__value">${amount}</div>
                            <div class="item__delete">
                                 <button class="item__delete--btn deleteb">x</button>
                            </div>
                       </div>                   
-            </div>    
+            </div>     
                             `;
+
+        /*
+        transaction.innerHTML = `
+            <div class="item-a clearfix" data-id=${id}>
+                <div class="item__description">${description + ' ' +time}</p</div>
+                      <div class="right clearfix">
+                           <div class="item__value">${amount}</div>
+                           <div class="item__delete">
+                                <button class="item__delete--btn deleteb">x</button>
+                           </div>
+                      </div>
+            </div>
+                            `;
+
+         */
         if (type === 'inc') {
 
             this._el.querySelector('.income__list').insertBefore(transaction, this._el.querySelector('.income__list').children[0]);
         } else {
-            this._el.querySelector('.expenses__list').appendChild(transaction, this._el.querySelector('.expenses__list').children[0]);
+            this._el.querySelector('.expenses__list').appendChild(transaction);
         }
 
         //Adding to database:
@@ -56,7 +72,8 @@ export default class Transactions {
             amount: amount,
             description: description,
             type: type,
-            user_id: userMail
+            user_id: userMail,
+            time: time,
         })
             .then(function() {
                 console.log("Document successfully written!");
@@ -162,7 +179,7 @@ export default class Transactions {
                 querySnapshot.forEach(function(doc) {
                     // doc.data() is never undefined for query doc snapshots
                     const data = doc.data();
-                    self._addTransaction(doc.id, data.description, data.amount, data.type, data.user_id);
+                    self._addTransaction(doc.id, data.description, data.amount, data.type, data.user_id, data.time || `${new Date().getDate() + '.'+Number(new Date().getMonth()+1)}`);
 
                 });
 

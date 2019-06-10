@@ -3,7 +3,8 @@
 **********************************************/
 
 * {
-    margin: 0;
+
+
     padding: 0;
     box-sizing: border-box;
 }
@@ -136,7 +137,8 @@ body {
 }
 
 .add__type {
-    width: 55px;
+    max-width: 90%;
+    width: 200px;
     border: 1px solid #e7e7e7;
     height: 44px;
     font-size: 18px;
@@ -250,8 +252,8 @@ h2 {
     border-bottom: 1px solid #e7e7e7;
 }
 
-.item:first-child { border-top: 1px solid #e7e7e7; }
-.item:nth-child(even) { background-color: #f7f7f7; }
+.item-a:first-child { border-top: 1px solid #e7e7e7; }
+.item-a:nth-child(even) { background-color: #f7f7f7; }
 
 .item__description {
     float: left;
@@ -329,9 +331,9 @@ h2 {
 
 
 
-.item:hover .item__delete--btn { display: block; }
-.item:hover .item__value { transform: translateX(-20px); }
-.item:hover .item__percentage { transform: translateX(-20px); }
+.item-a:hover .item__delete--btn { display: block; }
+.item-a:hover .item__value { transform: translateX(-20px); }
+.item-a:hover .item__percentage { transform: translateX(-20px); }
 
 
 .unpaid {
@@ -350,14 +352,20 @@ h2 {
 /*****CAROUSEL IN BACKGROUND***/
 
 .main-text {
+    display: block;
+    color: white;
     text-align:center;
     position: absolute;
     top: 10px;
     width: 100%;
-    height: 100%;
-    color: black;
+
+
 }
 .main-text-item {
+
+    color: ghostwhite;
+
+    text-shadow: 4px 3px 0 black;
     width: 100%;
 }
 
@@ -385,7 +393,7 @@ h2 {
 }
 
 .carousel-inner img {
-    filter: opacity(0.5);
+    filter: opacity(1);
 
     width: 100%;
     background-size: cover;
@@ -450,12 +458,10 @@ h2 {
 }
 
 .google {
-    width: 100%;
-    left:0;
-    display:inline-block;
-margin:0 auto;
-   position: absolute;
-    bottom: 40px;
+    width: 90%;
+    max-width: 800px;
+    margin:auto;
+    bottom: 10px;
 
 
     background-image: url("./images/google-sign-in.png");
@@ -469,6 +475,12 @@ margin:0 auto;
     justify-content: center; /* align horizontal */
     align-items: center;
     margin-left: 50px;
+}
+
+.item-time {
+    margin-left: 10vh;
+    font-size: 0.8em;
+    color: gray;
 }
 
 

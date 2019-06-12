@@ -28,15 +28,15 @@ export default class AppController {
 
         });
 
-
-
         this._addEventListeners();
-
-
-
-
     }
 
+    /**
+     * Updates Data object and counts all incomes, expenses and total
+     * @param transaction
+     * @param typeOfAction Specifies type 'add' or 'delete'
+     * @private
+     */
     _updateData(transaction, typeOfAction) {
         //updating total
         if(typeOfAction === 'add') {
@@ -77,6 +77,10 @@ export default class AppController {
 
     }
 
+    /**
+     * Updates HTML of Budget
+     * @private
+     */
     _updateBudgetUI() {
         //console.log('new total: ' +this._data.total);
         document.querySelector('.budget__value').innerHTML = this._data.total + '€';
@@ -85,6 +89,10 @@ export default class AppController {
         document.querySelector('.budget__expenses--percentage').innerHTML = this._data.expensesPercentage + '%';
     }
 
+    /**
+     * Added all event listeners
+     * @private
+     */
     _addEventListeners() {
 
         document.addEventListener('DOMContentLoaded', event => {
@@ -113,7 +121,18 @@ export default class AppController {
                 let userMail = this._user.email;
                 let date = new Date();
                 let time = date.getDate() + '.' + Number(date.getUTCMonth()+1);
-                this._trans._addTransaction.call(this._trans, Math.round(Math.random()*100000000).toString(), description.value, value.value, type, userMail, time);
+                let id = Math.round(Math.random()*100000000).toString();
+
+                this._updateData({
+                    id: id,
+                        description: description.value,
+                    amount: value.value,
+                    type: type,
+                    userMail: userMail,
+                    time: time
+                }, 'add');
+
+                this._trans._addTransactionToDB.call(this._trans, id, description.value, value.value, type, userMail, time);
 
                 description.value = '';
                 value.value = '';
@@ -133,8 +152,12 @@ export default class AppController {
             }
 
             if (event.target.classList.contains('deleteb')) {
+
                 let itemToDelete = event.target.closest('.item-a');
                 let idToDelete = itemToDelete.dataset.id;
+                this._updateData({
+                    id: idToDelete,
+                }, 'remove');
                 this._trans._deleteTransaction(idToDelete, itemToDelete);
             }
 
@@ -142,9 +165,12 @@ export default class AppController {
 
         });
 
-
     }
 
+    /**
+     * Log out from account
+     * @private
+     */
     _logout() {
         const self = this;
         firebase.auth().signOut().then(function() {
@@ -155,6 +181,10 @@ export default class AppController {
         });
     }
 
+    /**
+     * Login with google account through Firebase
+     * @private
+     */
     _googleLogin() {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(provider).then(result => {
@@ -166,7 +196,10 @@ export default class AppController {
             .catch(err => console.log(err));
     }
 
-
+    /**
+     * Render a Page before Logging in
+     * @private
+     */
     _renderBeforeLogin() {
         this._el.innerHTML = `
         
@@ -201,7 +234,10 @@ export default class AppController {
 
     }
 
-
+    /**
+     * Render a Page after user has logged in
+     * @private
+     */
     _renderAfterLogin() {
         this._el.innerHTML = `
             <div id="transactions-container">
@@ -265,14 +301,8 @@ export default class AppController {
                       
                 </div>
             </div>
-           
-            
-            
             <div id="transactions_table">
-            
             </div>
-            
-            
         </div>  
         `;
 

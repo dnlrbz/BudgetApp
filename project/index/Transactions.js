@@ -1,10 +1,10 @@
 export default class Transactions {
     constructor(element, userMail, dataCallback) {
         this._el = element;
-        //this._app = firebase.app();
+        this._dataCallback = dataCallback;
         this._db = firebase.firestore();
         this._userMail = userMail;
-        this._dataCallback = dataCallback;
+
         this._render();
 
         this._el.addEventListener('click', event => {
@@ -18,26 +18,23 @@ export default class Transactions {
     }
 
 
+    /**
+     * Adding a transaction to HTML
+     * @param id
+     * @param transaction
+     * @private
+     */
+    _addTransactionToUI(id, transaction) {
 
-    _addTransaction(id, description, amount, type, userMail, time) {
-
-        this._dataCallback({
-            id: id,
-            description: description,
-            amount: amount,
-            type: type,
-            userMail: userMail,
-            time: time
-        }, 'add');
         //Adding to HTML
-        let transaction = document.createElement('div');
+        let elem = document.createElement('div');
 
-        transaction.innerHTML = `
+        elem.innerHTML = `
             <div class="item-a clearfix" data-id=${id}>
-                <div class="item__description"><span>${description}</span><span class="item-time">${time}</span></div>
+                <div class="item__description"><span>${transaction.description}</span><span class="item-time">${transaction.time}</span></div>
                 
                       <div class="right clearfix">
-                           <div class="item__value">${amount}</div>
+                           <div class="item__value">${transaction.amount}</div>
                            <div class="item__delete">
                                 <button class="item__delete--btn deleteb">x</button>
                            </div>
@@ -45,29 +42,27 @@ export default class Transactions {
             </div>     
                             `;
 
-        /*
-        transaction.innerHTML = `
-            <div class="item-a clearfix" data-id=${id}>
-                <div class="item__description">${description + ' ' +time}</p</div>
-                      <div class="right clearfix">
-                           <div class="item__value">${amount}</div>
-                           <div class="item__delete">
-                                <button class="item__delete--btn deleteb">x</button>
-                           </div>
-                      </div>
-            </div>
-                            `;
 
-         */
-        if (type === 'inc') {
+        if (transaction.type === 'inc') {
 
-            this._el.querySelector('.income__list').insertBefore(transaction, this._el.querySelector('.income__list').children[0]);
+            this._el.querySelector('.income__list').insertBefore(elem, this._el.querySelector('.income__list').children[0]);
         } else {
-            this._el.querySelector('.expenses__list').appendChild(transaction);
+            this._el.querySelector('.expenses__list').appendChild(elem);
         }
 
-        //Adding to database:
+    }
 
+    /**
+     * Save transaction to firebase firestore
+     * @param id
+     * @param description
+     * @param amount
+     * @param type
+     * @param userMail
+     * @param time
+     * @private
+     */
+    _addTransactionToDB(id, description, amount, type, userMail, time) {
         this._db.collection("transactions").doc(id.toString()).set({
             amount: amount,
             description: description,
@@ -76,19 +71,32 @@ export default class Transactions {
             time: time,
         })
             .then(function() {
-                console.log("Document successfully written!");
+                //   console.log("Document successfully written!");
             })
             .catch(function(error) {
                 console.error("Error writing document: ", error);
             });
-
+        /**
+         * Adding a Transaction to HTML
+         */
+        this._addTransactionToUI(id, {
+            amount: amount,
+            description: description,
+            type: type,
+            userMail: userMail,
+            time:time
+        });
 
     }
 
+    /**
+     * Delete transaction from HTML and from firebase firestore
+     * @param id
+     * @param element
+     * @private
+     */
     _deleteTransaction(id, element) {
-        this._dataCallback({
-            id: id,
-        }, 'remove');
+
         element.parentElement.removeChild(element);
         console.log('child removed');
         this._db.collection("transactions").doc(id).delete().then(function() {
@@ -99,8 +107,44 @@ export default class Transactions {
     }
 
 
-    _render() {
+    /**
+     * Gets all saved transactions andd calls method to add the to HTML
+     * @private
+     */
+    _getSavedTransactions() {
+        // saving context for calling other methods
         let self = this;
+
+        this._db.collection("transactions").where("user_id", "==", this._userMail)
+            .get()
+            .then(function(querySnapshot) {
+
+                querySnapshot.forEach(function(doc) {
+                    // doc.data() is never undefined for query doc snapshots
+                    const data = doc.data();
+                    self._addTransactionToUI(doc.id,{description: data.description,amount: data.amount, type: data.type,userMail: data.user_id, time:data.time || `${new Date().getDate() + '.'+Number(new Date().getMonth()+1)}`});
+                    self._dataCallback({
+                        id: doc.id,
+                        description: data.description,
+                        amount: data.amount,
+                        type: data.type,
+                        userMail: data.user_id,
+                        time: data.time
+                    }, 'add');
+                });
+
+
+            })
+            .catch(function(error) {
+                console.log("Error getting documents: ", error);
+            });
+    }
+
+    /**
+     * Render all Transactions in the HTML
+     * @private
+     */
+    _render() {
 
         this._el.innerHTML = `<div class="container clearfix">
                 <div class="income">
@@ -108,28 +152,7 @@ export default class Transactions {
                       
                     <div class="income__list">
                        
-                      <!--
-                        <div class="item clearfix" id="income-0">
-                            <div class="item__description">Salary</div>
-                            <div class="right clearfix">
-                                <div class="item__value">+ 2,100.00</div>
-                                <div class="item__delete">
-                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="item clearfix" id="income-1">
-                            <div class="item__description">Sold car</div>
-                            <div class="right clearfix">
-                                <div class="item__value">+ 1,500.00</div>
-                                <div class="item__delete">
-                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                       
-                     -->   
+                     
                     </div>
                      
                 </div>
@@ -141,55 +164,12 @@ export default class Transactions {
                     
                     <div class="expenses__list">
                        
-                        <!--
-                        <div class="item clearfix" id="expense-0">
-                            <div class="item__description">Apartment rent</div>
-                            <div class="right clearfix">
-                                <div class="item__value">- 900.00</div>
-                                <div class="item__percentage">21%</div>
-                                <div class="item__delete">
-                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item clearfix" id="expense-1">
-                            <div class="item__description">Grocery shopping</div>
-                            <div class="right clearfix">
-                                <div class="item__value">- 435.28</div>
-                                <div class="item__percentage">10%</div>
-                                <div class="item__delete">
-                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        -->
-                        
+                   
                     </div>
                 </div>
             </div>
-`
-
-
-
-
-        this._db.collection("transactions").where("user_id", "==", this._userMail)
-            .get()
-            .then(function(querySnapshot) {
-
-                querySnapshot.forEach(function(doc) {
-                    // doc.data() is never undefined for query doc snapshots
-                    const data = doc.data();
-                    self._addTransaction(doc.id, data.description, data.amount, data.type, data.user_id, data.time || `${new Date().getDate() + '.'+Number(new Date().getMonth()+1)}`);
-
-                });
-
-                //console.log(resultArray);
-            })
-            .catch(function(error) {
-                console.log("Error getting documents: ", error);
-            });
-
+        `;
+        this._getSavedTransactions();
     }
-
 
 }

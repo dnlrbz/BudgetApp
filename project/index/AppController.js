@@ -207,10 +207,10 @@ export default class AppController {
              
               <div class="carousel-inner">
                 <div class="carousel-item active item min-vh-100">
-                  <img src="./images/iphone.jpg" class="d-block min-vh-100 zoom" alt="...">
+                  <img src="images/iphone.jpg" class="d-block min-vh-100 zoom" alt="...">
                 </div>
                 <div class="carousel-item item min-vh-100">
-                  <img src="./images/mac.jpg" class="d-block min-vh-100 zoom" alt="...">
+                  <img src="images/mac.jpg" class="d-block min-vh-100 zoom" alt="...">
                 </div>
               </div>
               <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">

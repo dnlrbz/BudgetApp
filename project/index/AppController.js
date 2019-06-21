@@ -179,6 +179,13 @@ export default class AppController {
         }).catch(function(error) {
             console.log('Failed to log out');
         });
+        self._data = {
+            transactionsArray: [],
+            total: 0,
+            income: 0,
+            expenses: 0,
+            expensesPercentage: 0,
+        };
     }
 
     /**
